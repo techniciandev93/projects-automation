@@ -15,6 +15,13 @@ def start_command(message):
     bot.send_message(message.chat.id, text=welcome_message, reply_markup=kb_main_menu)
 
 
+@bot.message_handler(func=lambda message: message.text == 'Назад в основное меню 🔙')
+def back_to_main_menu(message):
+    main_menu_message = 'Вы вернулись в основное меню'
+    kb_main_menu = get_main_menu_kb()
+    bot.send_message(message.chat.id, main_menu_message, reply_markup=kb_main_menu)
+
+
 def get_main_menu_kb():
     kb_main_menu = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
     kb_main_menu_btn = (

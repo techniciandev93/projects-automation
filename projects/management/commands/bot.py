@@ -26,7 +26,12 @@ def back_to_main_menu(message):
 def handler_commands(message):
     user = User.objects.get(tg_id=message.from_user.id)
     user_status = user.status
-
+    if user.far_eastern:
+        call_time = '7:00 до 12:00'
+    else:
+        call_time = '14:00 до 23:00'
+    message_time = f'Пожалуйста, введите желаемое время в период с {call_time}.\n' \
+                   f'Время должно быть кратно 30 минутам, иначе оно будет округлено в меньшую сторону'
     if user_status == 'admin':
         kb_admin_main = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
         kb_admin_main_btn = (
@@ -34,21 +39,14 @@ def handler_commands(message):
             KeyboardButton(text='Загрузить учеников'),
         )
         kb_admin_main.add(*kb_admin_main_btn)
-        welcome_message = f'Привет, {message.from_user.username}!\n' \
-                          f'Пожалуйста загрузите список ПМ-ов и учеников'
-        bot.send_message(message.chat.id, welcome_message, reply_markup=kb_admin_main)
+        message_upload = f'Пожалуйста загрузите список ПМ-ов или учеников'
+        bot.send_message(message.chat.id, message_upload, reply_markup=kb_admin_main)
 
     elif user_status == 'PM':
-        welcome_message = f'Привет, {message.from_user.username}!\n' \
-                          f'Пожалуйста, введите желаемое время в период с 7:00 - 12:00, либо 14:00 - 23:00.\n' \
-                          f'Время должно быть кратно 30 минутам, иначе оно будет округлено в меньшую сторону'
-        bot.send_message(message.chat.id, welcome_message)
+        bot.send_message(message.chat.id, message_time)
 
     elif user_status == 'student':
-        welcome_message = f'Привет, {message.from_user.username}!\n' \
-                          f'Пожалуйста, введите желаемое время в период с 7:00 - 12:00, либо 14:00 - 23:00.\n' \
-                          f'Время должно быть кратно 30 минутам'
-        bot.send_message(message.chat.id, welcome_message)
+        bot.send_message(message.chat.id, message_time)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Ваш профиль ☑️')

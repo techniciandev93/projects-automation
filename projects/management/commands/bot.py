@@ -51,6 +51,35 @@ def handler_commands(message):
         bot.send_message(message.chat.id, welcome_message)
 
 
+@bot.message_handler(func=lambda message: message.text == 'Ваш профиль ☑️')
+def handler_get_status(message):
+    user = User.objects.get(tg_id=message.from_user.id)
+    user_status = user.status
+    status_message = f'Ваш статус {user_status}'
+    far_eastern = User.objects.get(tg_id=message.from_user.id)
+    if far_eastern:
+        far_eastern_btn = KeyboardButton(text='Я купил себе немца 🚗')
+    else:
+        far_eastern_btn = KeyboardButton(text='Я езжу на праворуком авто 🚗')
+    kb_status = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb_status_button = [
+        far_eastern_btn,
+        KeyboardButton(text='Назад в основное меню 🔙')
+    ]
+    kb_status.add(*kb_status_button)
+    bot.send_message(message.chat.id, text=status_message)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Я езжу на праворуком авто 🚗')
+def handler_far_eastern(message):
+    pass
+
+
+@bot.message_handler(func=lambda message: message.text == 'Я купил себе немца 🚗')
+def handler_far_eastern(message):
+    pass
+
+
 def get_main_menu_kb():
     kb_main_menu = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
     kb_main_menu_btn = (

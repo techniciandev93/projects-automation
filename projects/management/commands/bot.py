@@ -22,6 +22,35 @@ def back_to_main_menu(message):
     bot.send_message(message.chat.id, main_menu_message, reply_markup=kb_main_menu)
 
 
+@bot.message_handler(func=lambda message: message.text == 'Ваши команды 💻')
+def handler_commands(message):
+    user = User.objects.get(tg_id=message.from_user.id)
+    user_status = user.status
+
+    if user_status == 'admin':
+        kb_admin_main = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
+        kb_admin_main_btn = (
+            KeyboardButton(text='Загрузить ПМ-ов'),
+            KeyboardButton(text='Загрузить учеников'),
+        )
+        kb_admin_main.add(*kb_admin_main_btn)
+        welcome_message = f'Привет, {message.from_user.username}!\n' \
+                          f'Пожалуйста загрузите список ПМ-ов и учеников'
+        bot.send_message(message.chat.id, welcome_message, reply_markup=kb_admin_main)
+
+    elif user_status == 'PM':
+        welcome_message = f'Привет, {message.from_user.username}!\n' \
+                          f'Пожалуйста, введите желаемое время в период с 7:00 - 12:00, либо 14:00 - 23:00.\n' \
+                          f'Время должно быть кратно 30 минутам, иначе оно будет округлено в меньшую сторону'
+        bot.send_message(message.chat.id, welcome_message)
+
+    elif user_status == 'student':
+        welcome_message = f'Привет, {message.from_user.username}!\n' \
+                          f'Пожалуйста, введите желаемое время в период с 7:00 - 12:00, либо 14:00 - 23:00.\n' \
+                          f'Время должно быть кратно 30 минутам'
+        bot.send_message(message.chat.id, welcome_message)
+
+
 def get_main_menu_kb():
     kb_main_menu = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
     kb_main_menu_btn = (

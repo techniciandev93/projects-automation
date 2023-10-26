@@ -61,8 +61,7 @@ def handler_commands(message):
     if status == 'PM':
         kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
         work_time_btn = [
-            # KeyboardButton(text='Введите желаемое время работы в формате HH:MM - HH:MM')
-            KeyboardButton(text='Задать желаемое время работы')
+            KeyboardButton(text='Посмотреть рассписание созвонов')
         ]
         kb_work_time.add(*work_time_btn)
         bot.send_message(message.chat.id, message_time, reply_markup=kb_work_time)

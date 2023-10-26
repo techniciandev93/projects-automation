@@ -1,0 +1,90 @@
+{
+  "project_managers": [
+    {
+      "telegram_id": 112,
+      "name": "Доктор",
+      "username": "doctor_who",
+      "work_start": "18:00",
+      "work_end": "21:00"
+    },
+    {
+      "telegram_id": 113,
+      "name": "Мастер",
+      "username": "mater",
+      "work_start": "15:00",
+      "work_end": "18:00"
+    },
+    {
+      "telegram_id": 114,
+      "name": "Далек",
+      "username": "dalek",
+      "work_start": "12:00",
+      "work_end": "15:00"
+    }
+  ],
+  "students": [
+    {
+      "telegram_id": 115,
+      "pm": 112,
+      "name": "Андрей",
+      "username": "lol",
+      "skill": "Новичок"
+    },
+    {
+      "telegram_id": 116,
+      "pm": 112,
+      "name": "Сергей",
+      "username": "kek",
+      "skill": "Новичок"
+    },
+    {
+      "telegram_id": 117,
+      "pm": 112,
+      "name": "Роман",
+      "username": "boo",
+      "skill": "Новичок"
+    },
+    {
+      "telegram_id": 118,
+      "pm": 112,
+      "name": "Андрей",
+      "username": "zoo",
+      "skill": "Новичок+"
+    },
+    {
+      "telegram_id": 119,
+      "pm": 112,
+      "name": "Сергей",
+      "username": "woo",
+      "skill": "Новичок+"
+    },
+    {
+      "telegram_id": 120,
+      "pm": 113,
+      "name": "Роман",
+      "username": "foo",
+      "skill": "Новичок+"
+    },
+    {
+      "telegram_id": 121,
+      "pm": 113,
+      "name": "Андрей",
+      "username": "doo",
+      "skill": "Джун"
+    },
+    {
+      "telegram_id": 122,
+      "pm": 113,
+      "name": "Сергей",
+      "username": "too",
+      "skill": "Джун"
+    },
+    {
+      "telegram_id": 123,
+      "pm": 113,
+      "name": "Роман",
+      "username": "moo",
+      "skill": "Джун"
+    }
+  ]
+}

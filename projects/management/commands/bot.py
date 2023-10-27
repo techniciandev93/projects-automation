@@ -2,18 +2,18 @@ from django.core.management import BaseCommand
 from telebot import TeleBot
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 from projects_automation.settings import TELEGRAM_TOKEN
-from projects.models import Student, ProjectMenger
+from projects.models import Student, ProjectMenger, Team
 from telebot import custom_filters
 from telebot.handler_backends import State, StatesGroup
 from telebot.storage import StateMemoryStorage
 
 
-state_storage = StateMemoryStorage
+# state_storage = StateMemoryStorage
 bot = TeleBot(TELEGRAM_TOKEN, threaded=False)
 
-
-class BotStates(StatesGroup):
-    pm_set_time = State()
+#
+# class BotStates(StatesGroup):
+#     pm_set_time = State()
 
 
 @bot.message_handler(commands=['start'])
@@ -31,19 +31,23 @@ def back_to_main_menu(message):
     bot.send_message(message.chat.id, main_menu_message, reply_markup=kb_main_menu)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Ваши команды 💻')
-def handler_commands(message):
+def get_user(message):
     try:
         user = Student.objects.get(telegram_id=message.from_user.id)
-        status = 'Student'
     except Student.DoesNotExist:
-        user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
-        status = 'PM'
-    except ProjectMenger.DoesNotExist:
-        bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
-        return
+        try:
+            user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
+        except ProjectMenger.DoesNotExist:
+            bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
+            return
+    return user
+
+
+@bot.message_handler(func=lambda message: message.text == 'Ваши команды 💻')
+def handler_commands(message):
+    user = get_user(message)
     kb_call_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
-    if status == 'Student' and user.far_east:
+    if isinstance(user, Student) and user.far_east:
         call_time_btn = (
             KeyboardButton(text='7:00 - 9:00'),
             KeyboardButton(text='9:00 - 12:00'),
@@ -58,7 +62,7 @@ def handler_commands(message):
     kb_call_time.add(*call_time_btn)
     message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
 
-    if status == 'PM':
+    if isinstance(user, ProjectMenger):
         kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
         work_time_btn = [
             KeyboardButton(text='Посмотреть рассписание созвонов')
@@ -66,28 +70,31 @@ def handler_commands(message):
         kb_work_time.add(*work_time_btn)
         bot.send_message(message.chat.id, message_time, reply_markup=kb_work_time)
 
-    elif status == 'student':
+    elif isinstance(user, Student):
         bot.send_message(message.chat.id, message_time, reply_markup=kb_call_time)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Посмотреть рассписание созвонов')
+def get_call_time(message):
+    pass
 
 
 @bot.message_handler(func=lambda message: message.text == 'Ваш профиль ☑️')
 def handler_get_status(message):
-    try:
-        user = Student.objects.get(telegram_id=message.from_user.id)
-        status = 'Student'
-    except Student.DoesNotExist:
-        user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
-        status = 'PM'
-    except ProjectMenger.DoesNotExist:
-        bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
+    user = get_user(message)
+    if isinstance(user, Student):
+        status = 'Студент'
+    elif isinstance(user, ProjectMenger):
+        status = 'ПМ'
+    else:
         return
     status_message = f'Ваш статус - {status}'
-    if status == 'Student':
+    if isinstance(user, Student):
         far_eastern = user.far_east
         if far_eastern:
-            far_eastern_btn = KeyboardButton(text='Я купил себе немца 🚗')
+            far_eastern_btn = KeyboardButton(text='Изменить часовой пояс на  Дальний Восток')
         else:
-            far_eastern_btn = KeyboardButton(text='Я езжу на праворуком авто 🚗')
+            far_eastern_btn = KeyboardButton(text='Изменить часовой пояс на Мск')
         kb_status = ReplyKeyboardMarkup(resize_keyboard=True)
         kb_status_button = [
             far_eastern_btn,
@@ -103,36 +110,20 @@ def handler_get_status(message):
     bot.send_message(message.chat.id, text=status_message, reply_markup=kb_status)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Я езжу на праворуком авто 🚗')
+@bot.message_handler(func=lambda message: message.text == 'Изменить часовой пояс на  Дальний Восток')
 def handler_far_eastern(message):
-    try:
-        user = Student.objects.get(telegram_id=message.from_user.id)
-        status = 'Student'
-    except Student.DoesNotExist:
-        user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
-        status = 'PM'
-    except ProjectMenger.DoesNotExist:
-        bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
-        return
-    if status == 'Student':
+    user = get_user(message)
+    if isinstance(user, Student):
         user.far_east = True
         user.save()
         kb_main_menu = get_main_menu_kb()
         bot.send_message(message.chat.id, 'Ваш промежуток занятий обновлен', reply_markup=kb_main_menu)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Я купил себе немца 🚗')
+@bot.message_handler(func=lambda message: message.text == 'Изменить часовой пояс на Мск')
 def handler_far_eastern(message):
-    try:
-        user = Student.objects.get(telegram_id=message.from_user.id)
-        status = 'Student'
-    except Student.DoesNotExist:
-        user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
-        status = 'PM'
-    except ProjectMenger.DoesNotExist:
-        bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
-        return
-    if status == 'Student':
+    user = get_user(message)
+    if isinstance(user, Student):
         user.far_east = False
         user.save()
         kb_main_menu = get_main_menu_kb()
@@ -145,7 +136,7 @@ def get_main_menu_kb():
         KeyboardButton(text='Ваш профиль ☑️'),
         KeyboardButton(text='Ваши команды 💻'),
     )
-    kb_main_menu.add(kb_main_menu_btn)
+    kb_main_menu.add(*kb_main_menu_btn)
     return kb_main_menu
 
 

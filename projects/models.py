@@ -9,17 +9,12 @@ class Skill(models.Model):
 
 
 class Student(models.Model):
-    choices_week = (
-        ('third', 'Третья'),
-        ('fourth', 'Четвёртая')
-    )
     telegram_id = models.BigIntegerField(unique=True, verbose_name='ID пользователя в телеграмме')
     name = models.CharField(max_length=100, verbose_name='Имя студента')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, verbose_name='Навык студента', related_name='students')
     preferred_start_time = models.TimeField(blank=True, null=True, verbose_name='Начальное время созвона')
     preferred_end_time = models.TimeField(blank=True, null=True, verbose_name='Конечное время созвона')
     far_east = models.BooleanField(default=False, verbose_name='Регион Дальний Восток')
-    week = models.CharField(choices=choices_week, default='', blank=True, max_length=10, verbose_name='Неделя проекта')
 
     def __str__(self):
         return self.name
@@ -37,13 +32,18 @@ class ProjectManager(models.Model):
 
 
 class Team(models.Model):
+    choices_week = (
+        ('third', 'Третья'),
+        ('fourth', 'Четвёртая')
+    )
     start_call_time = models.TimeField(verbose_name='Начало созвона')
     end_call_time = models.TimeField(verbose_name='Конец созвона')
     name = models.CharField(max_length=100, verbose_name='Название команды')
-    project_menger = models.ForeignKey(ProjectManager, on_delete=models.CASCADE, null=True, blank=True,
+    project_manager = models.ForeignKey(ProjectManager, on_delete=models.CASCADE, null=True, blank=True,
                                        verbose_name='Проект менеджер')
     students = models.ManyToManyField(Student, related_name='teams', verbose_name='Студенты в команде')
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания команды')
+    week = models.CharField(choices=choices_week, default='', blank=True, max_length=10, verbose_name='Неделя проекта')
 
     def __str__(self):
         return self.name
@@ -51,7 +51,7 @@ class Team(models.Model):
 
 class Preferences(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-    project_menger = models.ForeignKey(ProjectManager, on_delete=models.SET_NULL, null=True, blank=True,
+    project_manager = models.ForeignKey(ProjectManager, on_delete=models.SET_NULL, null=True, blank=True,
                                        verbose_name='Проект менеджер')
     one_team = models.ManyToManyField(Student, related_name='team_with_students',
                                       verbose_name='Студенты в одной команде')

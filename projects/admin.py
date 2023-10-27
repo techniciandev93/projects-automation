@@ -29,6 +29,11 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Skill)
-admin.site.register(Student)
 admin.site.register(ProjectManager)
 admin.site.register(Preferences)
+
+
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    search_fields = ('name', 'skill')
+    list_filter = ('skill',)

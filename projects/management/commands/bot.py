@@ -2,7 +2,7 @@ from django.core.management import BaseCommand
 from telebot import TeleBot
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 from projects_automation.settings import TELEGRAM_TOKEN
-from projects.models import Student, ProjectMenger, Team
+from projects.models import Student, ProjectManager, Team
 from telebot import custom_filters
 from telebot.handler_backends import State, StatesGroup
 from telebot.storage import StateMemoryStorage
@@ -36,8 +36,8 @@ def get_user(message):
         user = Student.objects.get(telegram_id=message.from_user.id)
     except Student.DoesNotExist:
         try:
-            user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
-        except ProjectMenger.DoesNotExist:
+            user = ProjectManager.objects.get(telegram_id=message.from_user.id)
+        except ProjectManager.DoesNotExist:
             bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
             return
     return user
@@ -62,7 +62,7 @@ def handler_commands(message):
     kb_call_time.add(*call_time_btn)
     message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
 
-    if isinstance(user, ProjectMenger):
+    if isinstance(user, ProjectManager):
         kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
         work_time_btn = [
             KeyboardButton(text='Посмотреть рассписание созвонов')
@@ -84,7 +84,7 @@ def handler_get_status(message):
     user = get_user(message)
     if isinstance(user, Student):
         status = 'Студент'
-    elif isinstance(user, ProjectMenger):
+    elif isinstance(user, ProjectManager):
         status = 'ПМ'
     else:
         return

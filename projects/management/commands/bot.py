@@ -2,9 +2,18 @@ from django.core.management import BaseCommand
 from telebot import TeleBot
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 from projects_automation.settings import TELEGRAM_TOKEN
-from projects.models import User
+from projects.models import Student, ProjectMenger, Team
+from telebot import custom_filters
+from telebot.handler_backends import State, StatesGroup
+from telebot.storage import StateMemoryStorage
 
+
+# state_storage = StateMemoryStorage
 bot = TeleBot(TELEGRAM_TOKEN, threaded=False)
+
+#
+# class BotStates(StatesGroup):
+#     pm_set_time = State()
 
 
 @bot.message_handler(commands=['start'])
@@ -22,60 +31,103 @@ def back_to_main_menu(message):
     bot.send_message(message.chat.id, main_menu_message, reply_markup=kb_main_menu)
 
 
+def get_user(message):
+    try:
+        user = Student.objects.get(telegram_id=message.from_user.id)
+    except Student.DoesNotExist:
+        try:
+            user = ProjectMenger.objects.get(telegram_id=message.from_user.id)
+        except ProjectMenger.DoesNotExist:
+            bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
+            return
+    return user
+
+
 @bot.message_handler(func=lambda message: message.text == 'Ваши команды 💻')
 def handler_commands(message):
-    user = User.objects.get(tg_id=message.from_user.id)
-    user_status = user.status
-    if user.far_eastern:
-        call_time = '7:00 до 12:00'
-    else:
-        call_time = '14:00 до 23:00'
-    message_time = f'Пожалуйста, введите желаемое время в период с {call_time}.\n' \
-                   f'Время должно быть кратно 30 минутам, иначе оно будет округлено в меньшую сторону'
-    if user_status == 'admin':
-        kb_admin_main = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
-        kb_admin_main_btn = (
-            KeyboardButton(text='Загрузить ПМ-ов'),
-            KeyboardButton(text='Загрузить учеников'),
+    user = get_user(message)
+    kb_call_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
+    if isinstance(user, Student) and user.far_east:
+        call_time_btn = (
+            KeyboardButton(text='7:00 - 9:00'),
+            KeyboardButton(text='9:00 - 12:00'),
         )
-        kb_admin_main.add(*kb_admin_main_btn)
-        message_upload = f'Пожалуйста загрузите список ПМ-ов или учеников'
-        bot.send_message(message.chat.id, message_upload, reply_markup=kb_admin_main)
 
-    elif user_status == 'PM':
-        bot.send_message(message.chat.id, message_time)
+    else:
+        call_time_btn = (
+            KeyboardButton(text='14:00 - 17:00'),
+            KeyboardButton(text='17:00 - 20:00'),
+            KeyboardButton(text='20:00 - 23:00'),
+        )
+    kb_call_time.add(*call_time_btn)
+    message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
 
-    elif user_status == 'student':
-        bot.send_message(message.chat.id, message_time)
+    if isinstance(user, ProjectMenger):
+        kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
+        work_time_btn = [
+            KeyboardButton(text='Посмотреть рассписание созвонов')
+        ]
+        kb_work_time.add(*work_time_btn)
+        bot.send_message(message.chat.id, message_time, reply_markup=kb_work_time)
+
+    elif isinstance(user, Student):
+        bot.send_message(message.chat.id, message_time, reply_markup=kb_call_time)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Посмотреть рассписание созвонов')
+def get_call_time(message):
+    pass
 
 
 @bot.message_handler(func=lambda message: message.text == 'Ваш профиль ☑️')
 def handler_get_status(message):
-    user = User.objects.get(tg_id=message.from_user.id)
-    user_status = user.status
-    status_message = f'Ваш статус {user_status}'
-    far_eastern = User.objects.get(tg_id=message.from_user.id)
-    if far_eastern:
-        far_eastern_btn = KeyboardButton(text='Я купил себе немца 🚗')
+    user = get_user(message)
+    if isinstance(user, Student):
+        status = 'Студент'
+    elif isinstance(user, ProjectMenger):
+        status = 'ПМ'
     else:
-        far_eastern_btn = KeyboardButton(text='Я езжу на праворуком авто 🚗')
-    kb_status = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb_status_button = [
-        far_eastern_btn,
-        KeyboardButton(text='Назад в основное меню 🔙')
-    ]
-    kb_status.add(*kb_status_button)
-    bot.send_message(message.chat.id, text=status_message)
+        return
+    status_message = f'Ваш статус - {status}'
+    if isinstance(user, Student):
+        far_eastern = user.far_east
+        if far_eastern:
+            far_eastern_btn = KeyboardButton(text='Изменить часовой пояс на  Дальний Восток')
+        else:
+            far_eastern_btn = KeyboardButton(text='Изменить часовой пояс на Мск')
+        kb_status = ReplyKeyboardMarkup(resize_keyboard=True)
+        kb_status_button = [
+            far_eastern_btn,
+            KeyboardButton(text='Назад в основное меню 🔙')
+        ]
+        kb_status.add(*kb_status_button)
+    else:
+        kb_status = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        kb_status_button = [
+            KeyboardButton(text='Назад в основное меню 🔙')
+        ]
+        kb_status.add(*kb_status_button)
+    bot.send_message(message.chat.id, text=status_message, reply_markup=kb_status)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Я езжу на праворуком авто 🚗')
+@bot.message_handler(func=lambda message: message.text == 'Изменить часовой пояс на  Дальний Восток')
 def handler_far_eastern(message):
-    pass
+    user = get_user(message)
+    if isinstance(user, Student):
+        user.far_east = True
+        user.save()
+        kb_main_menu = get_main_menu_kb()
+        bot.send_message(message.chat.id, 'Ваш промежуток занятий обновлен', reply_markup=kb_main_menu)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Я купил себе немца 🚗')
+@bot.message_handler(func=lambda message: message.text == 'Изменить часовой пояс на Мск')
 def handler_far_eastern(message):
-    pass
+    user = get_user(message)
+    if isinstance(user, Student):
+        user.far_east = False
+        user.save()
+        kb_main_menu = get_main_menu_kb()
+        bot.send_message(message.chat.id, 'Ваш промежуток занятий обновлен', reply_markup=kb_main_menu)
 
 
 def get_main_menu_kb():
@@ -84,7 +136,7 @@ def get_main_menu_kb():
         KeyboardButton(text='Ваш профиль ☑️'),
         KeyboardButton(text='Ваши команды 💻'),
     )
-    kb_main_menu.add(kb_main_menu_btn)
+    kb_main_menu.add(*kb_main_menu_btn)
     return kb_main_menu
 
 

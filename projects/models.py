@@ -25,7 +25,7 @@ class Student(models.Model):
         return self.name
 
 
-class ProjectMenger(models.Model):
+class ProjectManager(models.Model):
     telegram_id = models.BigIntegerField(unique=True, verbose_name='ID ПМ в телеграмме')
     name = models.CharField(max_length=100, verbose_name='Имя ПМ')
     work_start_time = models.TimeField(verbose_name='Время начала работы')
@@ -37,8 +37,10 @@ class ProjectMenger(models.Model):
 
 
 class Team(models.Model):
+    start_call_time = models.TimeField(verbose_name='Начало созвона')
+    end_call_time = models.TimeField(verbose_name='Конец созвона')
     name = models.CharField(max_length=100, verbose_name='Название команды')
-    project_menger = models.ForeignKey(ProjectMenger, on_delete=models.CASCADE, null=True, blank=True,
+    project_menger = models.ForeignKey(ProjectManager, on_delete=models.CASCADE, null=True, blank=True,
                                        verbose_name='Проект менеджер')
     students = models.ManyToManyField(Student, related_name='teams', verbose_name='Студенты в команде')
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания команды')
@@ -49,7 +51,7 @@ class Team(models.Model):
 
 class Preferences(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-    project_menger = models.ForeignKey(ProjectMenger, on_delete=models.SET_NULL, null=True, blank=True,
+    project_menger = models.ForeignKey(ProjectManager, on_delete=models.SET_NULL, null=True, blank=True,
                                        verbose_name='Проект менеджер')
     one_team = models.ManyToManyField(Student, related_name='team_with_students',
                                       verbose_name='Студенты в одной команде')

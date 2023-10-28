@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import redirect
 from django.urls import path
+
 from projects.forms import UploadJsonFileForm
 from projects.models import Skill, Student, ProjectManager, Preferences, Team
+from projects.services import create_users, create_teams
 
 
 @admin.register(Team)
@@ -18,14 +22,21 @@ class TeamAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def create_teams(self, request):
-        pass
+        if request.method == 'POST':
+            create_teams()
+            return redirect(request.META['HTTP_REFERER'])
+        return HttpResponseNotAllowed(['GET'])
+
 
     def load_users(self, request):
-        form = UploadJsonFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            pass
-        else:
-            raise ValidationError(form.errors['__all__'])
+        if request.method == 'POST':
+            form = UploadJsonFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                create_users(form.cleaned_data['json_file'])
+                return redirect(request.META['HTTP_REFERER'])
+            else:
+                raise ValidationError(form.errors['__all__'])
+        return HttpResponseNotAllowed(['GET'])
 
 
 admin.site.register(Skill)

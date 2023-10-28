@@ -27,16 +27,16 @@ def create_users(path="users.json"):
             telegram_id=student['telegram_id'],
             name=student['name'],
             skill=skill_instance,
-            # preferred_start_time=student['work_start'],
-            # preferred_end_time=student['work_end'],
+            preferred_start_time=student['work_start'],
+            preferred_end_time=student['work_end'],
         )
 
     for project_manager in project_managers:
         ProjectManager.objects.create(
             telegram_id=str(project_manager['telegram_id']),
             name=project_manager['name'],
-            # work_start_time=project_manager['work_start'],
-            # work_end_time=project_manager['work_end']
+            work_start_time=project_manager['work_start'],
+            work_end_time=project_manager['work_end']
         )
 
 
@@ -74,7 +74,7 @@ def create_teams(maximum_students=3):
 
                 created_team = Team.objects.create(  # todo bulk create
                     name=group_name,
-                    project_menger=manager,
+                    project_manager=manager,
                     start_call_time=manager_work_start.strftime(time_format),
                     end_call_time=work_end.strftime(time_format),
                 )
@@ -89,5 +89,5 @@ def create_teams(maximum_students=3):
 
 
 if __name__ == '__main__':
-    create_users('users.json')
-    # create_teams()
+    #create_users('users.json')
+    create_teams()

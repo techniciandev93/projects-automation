@@ -38,10 +38,6 @@ class Week(models.Model):
 
 
 class Team(models.Model):
-    choices_week = (
-        ('third', 'Третья'),
-        ('fourth', 'Четвёртая')
-    )
     start_call_time = models.TimeField(verbose_name='Начало созвона')
     end_call_time = models.TimeField(verbose_name='Конец созвона')
     name = models.CharField(max_length=100, verbose_name='Название команды')

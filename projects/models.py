@@ -31,6 +31,13 @@ class ProjectManager(models.Model):
         return self.name
 
 
+class Week(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Наименование недели')
+
+    def __str__(self):
+        return self.name
+
+
 class Team(models.Model):
     choices_week = (
         ('third', 'Третья'),
@@ -43,7 +50,7 @@ class Team(models.Model):
                                        verbose_name='Проект менеджер')
     students = models.ManyToManyField(Student, related_name='teams', verbose_name='Студенты в команде')
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания команды')
-    week = models.CharField(choices=choices_week, default='', blank=True, max_length=10, verbose_name='Неделя проекта')
+    week = models.ForeignKey(Week, on_delete=models.CASCADE, null=True, blank=True, related_name="teams")
 
     def __str__(self):
         return self.name

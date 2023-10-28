@@ -15,6 +15,11 @@ def check_file(file):
     return True
 
 
+class CreateTeamForm(forms.Form):
+    maximum_students = forms.IntegerField()
+    break_time = forms.IntegerField()
+
+
 class UploadJsonFileForm(forms.Form):
     json_file = forms.FileField(label="Выберите JSON файл")
 

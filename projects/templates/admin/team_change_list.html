@@ -13,8 +13,14 @@
   <hr>
   <br>
   <form action="{% url 'admin:team_view' %}" method="POST">
-    {% csrf_token %}
-    <input type="submit" value="Создать команды"/>
+      {% csrf_token %}
+      <p><label for="id_maximum_student">Количество студентов</label>
+          <br>
+      <input type="number" id="id_maximum_students" name="maximum_students" required /></p>
+      <p><label for="id_break_time">Перерыв</label>
+          <br>
+      <input type="number" id="id_break_time" name="break_time" required /></p>
+      <input type="submit" value="Создать команды"/>
   </form>
   {{ block.super }}
 {% endblock %}

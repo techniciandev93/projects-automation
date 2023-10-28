@@ -25,7 +25,6 @@ class ProjectManager(models.Model):
     name = models.CharField(max_length=100, verbose_name='Имя ПМ')
     work_start_time = models.TimeField(verbose_name='Время начала работы')
     work_end_time = models.TimeField(verbose_name='Время окончания работы')
-    students = models.ManyToManyField(Student, blank=True, verbose_name='Студенты')
 
     def __str__(self):
         return self.name

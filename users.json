@@ -1,213 +1,69 @@
 {
-    "project_managers": [
+  "project_managers": [
+    {
+      "name": "Доктор",
+      "username": "doctor_who",
+      "work_start": "18:00",
+      "work_end": "21:00"
+    },
+    {
+      "name": "Мастер",
+      "username": "mater",
+      "work_start": "15:00",
+      "work_end": "18:00"
+    },
+    {
+      "name": "Далек",
+      "username": "dalek",
+      "work_start": "12:00",
+      "work_end": "15:00"
+    }
+  ],
+  "students": [
+    {
+      "name": "Андрей",
+      "username": "lol",
+      "skill": "Новичок"
+    },
+    {
+      "name": "Сергей",
+      "username": "kek",
+      "skill": "Новичок"
+    },
+    {
+      "name": "Роман",
+      "username": "boo",
+      "skill": "Новичок"
+    },
+    {
+      "name": "Андрей",
+      "username": "zoo",
+      "skill": "Новичок+"
+    },
+    {
+      "name": "Сергей",
+      "username": "woo",
+      "skill": "Новичок+"
+    },
+    {
+      "name": "Роман",
+      "username": "foo",
+      "skill": "Новичок+"
+    },
         {
-            "name": "Доктор",
-            "telegram_id": 112,
-            "work_end": "21:00:00",
-            "work_start": "18:00:00"
-        },
-        {
-            "name": "Мастер",
-            "telegram_id": 113,
-            "work_end": "18:00:00",
-            "work_start": "15:00:00"
-        },
-        {
-            "name": "Далек",
-            "telegram_id": 114,
-            "work_end": "15:00:00",
-            "work_start": "12:00:00"
-        }
-    ],
-    "students": [
-        {
-            "name": "Андрей",
-            "telegram_id": 115,
-            "work_end": "15:20",
-            "work_start": "15:00",
-            "skill": "Новичок"
-        },
-        {
-            "name": "Сергей",
-            "telegram_id": 116,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок"
-        },
-        {
-            "name": "Роман",
-            "telegram_id": 117,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок"
-        },
-        {
-            "name": "Андрей",
-            "telegram_id": 118,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Сергей",
-            "telegram_id": 119,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Роман",
-            "telegram_id": 120,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Андрей",
-            "telegram_id": 121,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Сергей",
-            "telegram_id": 122,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Роман",
-            "telegram_id": 123,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Сяо Бай",
-            "telegram_id": 140,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Сяо Ву",
-            "telegram_id": 141,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Андрей 142",
-            "telegram_id": 142,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Андрей 143",
-            "telegram_id": 143,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Андрей 150",
-            "telegram_id": 150,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Сергей 151",
-            "telegram_id": 151,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Роман 152",
-            "telegram_id": 152,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Новичок+"
-        },
-        {
-            "name": "Андрей 153",
-            "telegram_id": 153,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Сергей 154",
-            "telegram_id": 154,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Роман 155",
-            "telegram_id": 155,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Андрей 156",
-            "telegram_id": 156,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Сергей 157",
-            "telegram_id": 157,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Роман 158",
-            "telegram_id": 158,
-            "work_end": "19:20:00",
-            "work_start": "19:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Сяо Бай 159",
-            "telegram_id": 159,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Сяо Ву 160",
-            "telegram_id": 160,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Андрей 142 161",
-            "telegram_id": 161,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Андрей 143 162",
-            "telegram_id": 162,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        },
-        {
-            "name": "Андрей 150 163",
-            "telegram_id": 163,
-            "work_end": "15:20:00",
-            "work_start": "15:00:00",
-            "skill": "Джун"
-        }
-    ]
+      "name": "Андрей",
+      "username": "doo",
+      "skill": "Джун"
+    },
+    {
+      "name": "Сергей",
+      "username": "too",
+      "skill": "Джун"
+    },
+    {
+      "name": "Роман",
+      "username": "moo",
+      "skill": "Джун"
+    }
+  ]
 }

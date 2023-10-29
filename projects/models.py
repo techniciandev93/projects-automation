@@ -10,6 +10,8 @@ class Skill(models.Model):
 
 class Student(models.Model):
     telegram_id = models.BigIntegerField(unique=True, blank=True, null=True, verbose_name='ID пользователя в телеграмме')
+    chat_id = models.BigIntegerField(unique=True, blank=True, null=True,
+                                         verbose_name='ID чата')
     name = models.CharField(max_length=100, verbose_name='Имя студента')
     username = models.CharField(max_length=100, verbose_name='Логин в телеграмм')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, verbose_name='Навык студента', related_name='students')
@@ -22,6 +24,8 @@ class Student(models.Model):
 
 
 class ProjectManager(models.Model):
+    chat_id = models.BigIntegerField(unique=True, blank=True, null=True,
+                                     verbose_name='ID чата')
     username = models.CharField(max_length=100, verbose_name='Логин в телеграмм')
     telegram_id = models.BigIntegerField(unique=True, blank=True, null=True, verbose_name='ID ПМ в телеграмме')
     name = models.CharField(max_length=100, verbose_name='Имя ПМ')

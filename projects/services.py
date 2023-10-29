@@ -1,42 +1,31 @@
+import datetime
 import json
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'projects_automation.settings')
-import django
-
-django.setup()
-from projects.models import ProjectManager, Team, Student, Skill, Week
-
 from datetime import datetime, timedelta
+from projects.models import Skill, Student, ProjectManager, Team, Week
 
 
-def create_users(path="users.json"):
-    with open(path, 'r') as file:
-        users = json.load(file, )
+def create_users(obj_file):
+    users = json.load(obj_file)
 
     project_managers = users.get('project_managers')
     students = users.get('students')
 
-    Skill.objects.all().delete()
-    Student.objects.all().delete()
-    ProjectManager.objects.all().delete()
-
     for student in students:
         skill_instance, created = Skill.objects.get_or_create(student_skill=student['skill'])
-        Student.objects.create(
+        Student.objects.get_or_create(
             telegram_id=student['telegram_id'],
             name=student['name'],
             skill=skill_instance,
-            # preferred_start_time=student['work_start'],
-            # preferred_end_time=student['work_end'],
+            preferred_start_time=student['work_start'],
+            preferred_end_time=student['work_end'],
         )
 
     for project_manager in project_managers:
-        ProjectManager.objects.create(
+        ProjectManager.objects.get_or_create(
             telegram_id=str(project_manager['telegram_id']),
             name=project_manager['name'],
-            # work_start_time=project_manager['work_start'],
-            # work_end_time=project_manager['work_end']
+            work_start_time=project_manager['work_start'],
+            work_end_time=project_manager['work_end']
         )
 
 
@@ -91,8 +80,3 @@ def create_teams(week, maximum_students, break_time):
             print(f"New group {group_name}: {skill_group}")
             manager_work_start = work_end + timedelta(minutes=break_time)
             skill_group.clear()
-
-
-if __name__ == '__main__':
-    create_users('users.json')
-    # create_teams()

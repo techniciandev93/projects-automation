@@ -15,9 +15,7 @@ def create_users(obj_file):
         Student.objects.get_or_create(
             username=student['username'],
             name=student['name'],
-            skill=skill_instance,
-            preferred_start_time=student['work_start'],
-            preferred_end_time=student['work_end'],
+            skill=skill_instance
         )
 
     for project_manager in project_managers:

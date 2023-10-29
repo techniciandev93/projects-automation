@@ -32,8 +32,6 @@ def back_to_main_menu(message):
     bot.send_message(message.chat.id, main_menu_message, reply_markup=kb_main_menu)
     bot.delete_state(message.from_user.id, message.chat.id)
 
-# message.from_user.username
-
 
 def get_user(message):
     try:

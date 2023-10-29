@@ -9,8 +9,9 @@ class Skill(models.Model):
 
 
 class Student(models.Model):
-    telegram_id = models.BigIntegerField(unique=True, verbose_name='ID пользователя в телеграмме')
+    telegram_id = models.BigIntegerField(unique=True, blank=True, null=True, verbose_name='ID пользователя в телеграмме')
     name = models.CharField(max_length=100, verbose_name='Имя студента')
+    username = models.CharField(max_length=100, verbose_name='Логин в телеграмм')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, verbose_name='Навык студента', related_name='students')
     preferred_start_time = models.TimeField(blank=True, null=True, verbose_name='Начальное время созвона')
     preferred_end_time = models.TimeField(blank=True, null=True, verbose_name='Конечное время созвона')
@@ -21,7 +22,8 @@ class Student(models.Model):
 
 
 class ProjectManager(models.Model):
-    telegram_id = models.BigIntegerField(unique=True, verbose_name='ID ПМ в телеграмме')
+    username = models.CharField(max_length=100, verbose_name='Логин в телеграмм')
+    telegram_id = models.BigIntegerField(unique=True, blank=True, null=True, verbose_name='ID ПМ в телеграмме')
     name = models.CharField(max_length=100, verbose_name='Имя ПМ')
     work_start_time = models.TimeField(verbose_name='Время начала работы')
     work_end_time = models.TimeField(verbose_name='Время окончания работы')

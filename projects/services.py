@@ -13,7 +13,7 @@ def create_users(obj_file):
     for student in students:
         skill_instance, created = Skill.objects.get_or_create(student_skill=student['skill'])
         Student.objects.get_or_create(
-            telegram_id=student['telegram_id'],
+            username=student['username'],
             name=student['name'],
             skill=skill_instance,
             preferred_start_time=student['work_start'],
@@ -22,7 +22,7 @@ def create_users(obj_file):
 
     for project_manager in project_managers:
         ProjectManager.objects.get_or_create(
-            telegram_id=str(project_manager['telegram_id']),
+            username=str(project_manager['username']),
             name=project_manager['name'],
             work_start_time=project_manager['work_start'],
             work_end_time=project_manager['work_end']

@@ -14,7 +14,7 @@
   <br>
   <form action="{% url 'admin:team_view' %}" method="POST">
       {% csrf_token %}
-      <p><label for="id_maximum_student">Количество студентов</label>
+      <p><label for="id_maximum_students">Количество студентов</label>
           <br>
       <input type="number" id="id_maximum_students" name="maximum_students" required /></p>
       <p><label for="id_break_time">Перерыв</label>

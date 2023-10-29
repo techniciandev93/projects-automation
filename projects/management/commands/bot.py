@@ -35,26 +35,50 @@ def back_to_main_menu(message):
 
 def get_user(message):
     try:
-        user = Student.objects.get(telegram_id=message.from_user.id)
+        user = Student.objects.get(username=message.from_user.username)
+        user.telegram_id = message.from_user.id
+        user.chat_id = message.chat.id
+        user.save()
     except Student.DoesNotExist:
         try:
-            user = ProjectManager.objects.get(telegram_id=message.from_user.id)
+            user = ProjectManager.objects.get(username=message.from_user.username)
+            user.telegram_id = message.from_user.id
+            user.chat_id = message.chat.id
+            user.save()
         except ProjectManager.DoesNotExist:
             bot.send_message(message.chat.id, 'Вы не являетесь зарегистрированным пользователем')
             return
     return user
 
 
+@bot.message_handler(func=lambda message: message.text == 'Отменить запись 🚫')
+def handler_remove_entry(message):
+    user = get_user(message)
+    user.preferred_start_time = None
+    user.preferred_end_time = None
+    user.save()
+    kb_main_menu = get_main_menu_kb()
+    message_remove = 'Вы отменили свою запись'
+    bot.send_message(message.chat.id, message_remove, reply_markup=kb_main_menu)
+
+
 @bot.message_handler(func=lambda message: message.text == 'Ваши команды 💻')
 def handler_commands(message):
     user = get_user(message)
     kb_call_time = ReplyKeyboardMarkup(row_width=2, one_time_keyboard=True, resize_keyboard=True)
-    if isinstance(user, Student) and user.far_east:
+    if isinstance(user, Student) and user.preferred_start_time:
+        call_time_btn = (
+            KeyboardButton(text='Отменить запись 🚫'),
+            KeyboardButton(text='Назад в основное меню 🔙')
+        )
+        message_time = f'У вас уже имеется запись, вы можете отменить ее'
+    elif isinstance(user, Student) and user.far_east:
         call_time_btn = (
             KeyboardButton(text='7:00 - 9:00'),
             KeyboardButton(text='9:00 - 12:00'),
             KeyboardButton(text='Назад в основное меню 🔙')
         )
+        message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
 
     else:
         call_time_btn = (
@@ -63,8 +87,8 @@ def handler_commands(message):
             KeyboardButton(text='20:00 - 23:00'),
             KeyboardButton(text='Назад в основное меню 🔙')
         )
+        message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
     kb_call_time.add(*call_time_btn)
-    message_time = f'Пожалуйста, выберите желаемый диапазон времени для занятий'
 
     if isinstance(user, ProjectManager):
         kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)

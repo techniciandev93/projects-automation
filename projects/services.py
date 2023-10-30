@@ -2,6 +2,7 @@ import datetime
 import json
 from datetime import datetime, timedelta
 from projects.models import Skill, Student, ProjectManager, Team, Week
+from .management.commands.bot import send_notification_student, send_notification_pm
 
 
 def create_users(obj_file):
@@ -74,7 +75,18 @@ def create_teams(week, maximum_students, break_time):
                 week=week
             )
             created_team.students.set(skill_group)
-
             print(f"New group {group_name}: {skill_group}")
+            try:
+                send_notification_pm(created_team.project_manager.telegram_id,
+                                     created_team.name,
+                                     created_team.start_call_time,
+                                     created_team.end_call_time)
+                for learner in skill_group:
+                    if learner.telegram_id:
+                        send_notification_student(learner.telegram_id,
+                                                  created_team.start_call_time,
+                                                  created_team.end_call_time)
+            except Exception:
+                continue
             manager_work_start = work_end + timedelta(minutes=break_time)
             skill_group.clear()

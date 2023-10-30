@@ -261,6 +261,19 @@ def get_main_menu_kb():
     return kb_main_menu
 
 
+def send_notification_student(student, start_time, end_time):
+    message_notification = f'Ваша группа сформирована. Время созвона: {start_time} : {end_time}'
+    bot.send_message(student, message_notification)
+
+
+def send_notification_pm(pm, group, start_time, end_time):
+    message_notification = f'В ваши созвоны добавлена группа: {group}.\n' \
+                           f'Время созвона: {start_time} : {end_time}\n'\
+                           f' Для просмотра зайдите в бота ' \
+                           f'и нажмите "Посмотреть рассписание созвонов" в ваших командах.'
+    bot.send_message(pm, message_notification)
+
+
 def main():
     bot.add_custom_filter(custom_filters.StateFilter(bot))
     bot.polling(skip_pending=True)

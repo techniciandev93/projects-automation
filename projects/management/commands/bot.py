@@ -1,11 +1,12 @@
 from django.core.management import BaseCommand
 from telebot import TeleBot
-from telebot.types import KeyboardButton, ReplyKeyboardMarkup
+from telebot.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from projects_automation.settings import TELEGRAM_TOKEN
-from projects.models import Student, ProjectManager
+from projects.models import Student, ProjectManager, Team
 from telebot import custom_filters
 from telebot.handler_backends import State, StatesGroup
 from telebot.storage import StateMemoryStorage
+import json
 
 
 state_storage = StateMemoryStorage()
@@ -93,9 +94,11 @@ def handler_commands(message):
     if isinstance(user, ProjectManager):
         kb_work_time = ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
         work_time_btn = [
-            KeyboardButton(text='Посмотреть рассписание созвонов')
+            KeyboardButton(text='Посмотреть рассписание созвонов'),
+            KeyboardButton(text='Назад в основное меню 🔙')
         ]
         kb_work_time.add(*work_time_btn)
+        message_time = 'Доступные команды'
         bot.send_message(message.chat.id, message_time, reply_markup=kb_work_time)
 
     elif isinstance(user, Student):
@@ -117,7 +120,84 @@ def set_student_time(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Посмотреть рассписание созвонов')
 def get_call_time(message):
-    pass
+    user = get_user(message)
+    try:
+        team = Team.objects.filter(project_manager=user)
+        if team.exists():
+            page = 1
+            count = team.count()
+            students_in_team = team[page - 1].students.all()
+            student_names = ", ".join(student.name for student in students_in_team)
+            skill = students_in_team[0].skill
+            markup = InlineKeyboardMarkup()
+            markup.add(InlineKeyboardButton(text='Скрыть', callback_data='unseen'))
+            markup.add(InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
+                       InlineKeyboardButton(text=f'Вперёд --->', callback_data=f'{{"method": "pagination",'
+                                                                               f'"NumberPage": {page + 1}, '
+                                                                               f'"CountPage": {count}}}'
+                                            ))
+            bot.send_message(message.from_user.id, f'Группа: <b>{team[page - 1].name}</b>\n\n'
+                                                   f'Время старта созвона:\n{team[page - 1].start_call_time}\n\n'
+                                                   f'Время окончания созвона:\n{team[page - 1].end_call_time}\n\n'
+                                                   f'Рабочая неделя:\n{team[page - 1].week}\n\n'
+                                                   f'Студенты:\n{student_names}\n\n'
+                                                   f'Уровень группы:\n{skill}',
+
+                             reply_markup=markup, parse_mode='HTML')
+    except Team.DoesNotExist:
+        bot.send_message(message.chat.id, text='Команды не сформированы')
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    user = ProjectManager.objects.get(username=call.from_user.username)
+    team = Team.objects.filter(project_manager=user)
+    req = call.data.split('_')
+    if req[0] == 'unseen':
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    elif 'pagination' in req[0]:
+        json_string = json.loads(req[0])
+        count = json_string['CountPage']
+        page = json_string['NumberPage']
+        students_in_team = team[page - 1].students.all()
+        student_names = ", ".join(student.name for student in students_in_team)
+        skill = students_in_team[0].skill
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton(text='Скрыть', callback_data='unseen'))
+        if page == 1:
+            markup.add(
+                InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
+                InlineKeyboardButton(text=f'Вперёд --->',
+                                     callback_data=f'{{"method":"pagination","NumberPage":{page + 1},'
+                                                   f'"CountPage":{count}}}')
+            )
+        elif page == count:
+            markup.add(InlineKeyboardButton(text=f'<--- Назад',
+                                            callback_data=f'{{"method":"pagination","NumberPage":{page - 1},'
+                                                          f'"CountPage": {count}}}'
+                                            ),
+
+                       InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '))
+        else:
+            markup.add(InlineKeyboardButton(text=f'<--- Назад',
+                                            callback_data=f'{{"method":"pagination","NumberPage":{page - 1},'
+                                                          f'"CountPage": {count}}}'),
+                       InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
+                       InlineKeyboardButton(text=f'Вперёд --->',
+                                            callback_data=f'{{"method":"pagination","NumberPage":{page + 1},'
+                                                          f'"CountPage":{count}}}'))
+
+        bot.edit_message_text(f'Группа: <b>{team[page - 1].name}</b>\n\n'
+                              f'Время старта созвона:\n{team[page - 1].start_call_time}\n\n'
+                              f'Время окончания созвона:\n{team[page - 1].end_call_time}\n\n'
+                              f'Рабочая неделя:\n{team[page - 1].week}\n\n'
+                              f'Студенты:\n{student_names}\n\n'
+                              f'Уровень группы:\n{skill}',
+
+                              reply_markup=markup,
+                              parse_mode='HTML',
+                              chat_id=call.message.chat.id,
+                              message_id=call.message.message_id)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Ваш профиль ☑️')
